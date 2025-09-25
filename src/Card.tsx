@@ -10,7 +10,7 @@ const Card = ({name}:PokemonProps) =>{
 
     return (
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-            <h1>Pokemon:{name}</h1>
+            <h3>Pokemon: {name}</h3>
         </div>
     )
 }
