@@ -6,28 +6,52 @@ const BASE = 'https://pokeapi.co/api/v2/';
 
 type Pokemon = {
     name: string;
+    id: number;
+    height: number;
+    weight: number;
+    abilities: string[];
+    types: string[];
+    sprite: string;
 };
 
 function App() {
     const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    function getAllPokemons() {
-        setLoading(true);
-        setError(null);
+    async function getPokemonDetails(pokemonName: string): Promise<Pokemon> {
+        const response = await fetch(`${BASE}pokemon/${pokemonName}`);
+        const pokemonData = await response.json();
 
-        fetch(`${BASE}pokemon`)
-            .then(res => res.json())
-            .then(pokemonList => {
-                const pokemonNames = pokemonList.results.map((pokemon: { name: string }) => ({ name: pokemon.name }));
-                setPokemons(pokemonNames);
-                setLoading(false);
-            })
-            .catch(err => {
-                setError("Coś poszło nie tak, spróbuj ponownie.");
-                setLoading(false);
-            });
+        return {
+            name: pokemonData.name,
+            id: pokemonData.id,
+            height: pokemonData.height,
+            weight: pokemonData.weight,
+            abilities: pokemonData.abilities.map((ability: any) => ability.ability.name),
+            types: pokemonData.types.map((type: any) => type.type.name),
+            sprite: pokemonData.sprites.front_default
+        };
+    }
+
+    async function getAllPokemons() {
+        try {
+            setLoading(true);
+            const response = await fetch(`${BASE}pokemon?limit=20`); // Ograniczam do 20 dla szybszego ładowania
+            const pokemonList = await response.json();
+
+            // Pobieramy szczegółowe dane dla każdego Pokemona
+            const detailedPokemons = await Promise.all(
+                pokemonList.results.map((pokemon: { name: string }) =>
+                    getPokemonDetails(pokemon.name)
+                )
+            );
+
+            setPokemons(detailedPokemons);
+        } catch (err) {
+            console.log('Błąd podczas pobierania danych:', err);
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -37,16 +61,24 @@ function App() {
     return (
         <>
             <h1>Pokemony</h1>
-
-            {/* Warunkowe renderowanie */}
-            {loading && <p>Ładowanie danych...</p>}
-            {error && <p>{error}</p>}
-            {pokemons.length === 0 && !loading && !error && <p>Brak wyników do wyświetlenia</p>}
-
             <div style={{ textAlign: "center" }}>
-                {pokemons.map((pokemon) => (
-                    <Card key={pokemon.name} name={pokemon.name} />
-                ))}
+                {loading ? (
+                    <p>Ładowanie...</p>
+                ) : (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                        gap: '20px',
+                        padding: '20px'
+                    }}>
+                        {pokemons.map((pokemon) => (
+                            <Card
+                                key={pokemon.id}
+                                pokemon={pokemon}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </>
     );
