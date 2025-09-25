@@ -36,10 +36,10 @@ function App() {
     async function getAllPokemons() {
         try {
             setLoading(true);
-            const response = await fetch(`${BASE}pokemon?limit=20`); // Ograniczam do 20 dla szybszego ładowania
+            const response = await fetch(`${BASE}pokemon?limit=40`);
             const pokemonList = await response.json();
 
-            // Pobieramy szczegółowe dane dla każdego Pokemona
+
             const detailedPokemons = await Promise.all(
                 pokemonList.results.map((pokemon: { name: string }) =>
                     getPokemonDetails(pokemon.name)
@@ -66,18 +66,18 @@ function App() {
                     <p>Ładowanie...</p>
                 ) : (
                     <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                        display: 'flex',
+                        flexWrap: 'wrap',
                         gap: '20px',
+                        justifyContent: 'center',
                         padding: '20px'
                     }}>
                         {pokemons.map((pokemon) => (
-                            <Card
-                                key={pokemon.id}
-                                pokemon={pokemon}
-                            />
+                            <Card key={pokemon.id} pokemon={pokemon} />
                         ))}
                     </div>
+
+
                 )}
             </div>
         </>

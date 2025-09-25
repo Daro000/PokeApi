@@ -86,7 +86,7 @@ const Card = ({ pokemon }: PokemonProps) => {
     );
 };
 
-// Funkcja pomocnicza do kolorów typów
+
 function getTypeColor(type: string): string {
     const colors: { [key: string]: string } = {
         normal: '#A8A878',
