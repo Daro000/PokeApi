@@ -7,11 +7,13 @@ interface PokemonProps {
         abilities: string[];
         types: string[];
         sprite: string;
-    }
+    };
+    showDetails: boolean;
+    onToggleDetails: () => void;
 }
 
-const Card = ({ pokemon }: PokemonProps) => {
-    const { name, id, height, weight, abilities, types, sprite } = pokemon;
+const Card = ({pokemon, showDetails, onToggleDetails}: PokemonProps) => {
+    const {name, id, height, weight, abilities, types, sprite} = pokemon;
 
     return (
         <div style={{
@@ -46,9 +48,9 @@ const Card = ({ pokemon }: PokemonProps) => {
                 />
             )}
 
-            <div style={{ marginBottom: '10px' }}>
+            <div style={{marginBottom: '10px'}}>
                 <strong>Typy:</strong>
-                <div style={{ display: 'flex', gap: '5px', marginTop: '5px' }}>
+                <div style={{display: 'flex', gap: '5px', marginTop: '5px'}}>
                     {types.map(type => (
                         <span
                             key={type}
@@ -67,22 +69,45 @@ const Card = ({ pokemon }: PokemonProps) => {
                 </div>
             </div>
 
-            <div style={{ marginBottom: '10px', textAlign: 'left', width: '100%' }}>
+            <div style={{marginBottom: '10px', textAlign: 'left', width: '100%'}}>
                 <strong>Umiejętności:</strong>
-                <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+                <ul style={{margin: '5px 0', paddingLeft: '20px'}}>
                     {abilities.map(ability => (
-                        <li key={ability} style={{ textTransform: 'capitalize' }}>
+                        <li key={ability} style={{textTransform: 'capitalize'}}>
                             {ability.replace('-', ' ')}
                         </li>
                     ))}
                 </ul>
             </div>
 
-            <div style={{ fontSize: '14px', color: '#666' }}>
-                <div><strong>Wzrost:</strong> {height / 10} m</div>
-                <div><strong>Waga:</strong> {weight / 10} kg</div>
+            <button
+                onClick={onToggleDetails}
+                style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    marginTop: '10px'
+                }}
+            >
+                {showDetails ? 'Ukryj szczegóły' : 'Pokaż szczegóły'}
+            </button>
+
+
+            {showDetails && (
+                <div style={{
+                    fontSize: '14px',
+                    color: '#666',
+                    marginTop: '10px',
+                    textAlign: 'center'
+                }}>
+                    <div><strong>Wzrost:</strong> {height / 10} m</div>
+                    <div><strong>Waga:</strong> {weight / 10} kg</div>
+                </div>
+            )}
             </div>
-        </div>
     );
 };
 

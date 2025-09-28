@@ -15,8 +15,18 @@ type Pokemon = {
 };
 
 function App() {
+
+
+    const [showDetailsForId, setShowDetailsForId] = useState<number | null>(null);
+    const [selectedType, setSelectedType] = useState('');
+    const [text, setText] = useState('');
     const [pokemons, setPokemons] = useState<Pokemon[]>([]);
     const [loading, setLoading] = useState(true);
+
+    function getUniqueTypes() {
+        const allTypes = pokemons.flatMap(pokemon => pokemon.types);
+        return [...new Set(allTypes)];
+    }
 
     async function getPokemonDetails(pokemonName: string): Promise<Pokemon> {
         const response = await fetch(`${BASE}pokemon/${pokemonName}`);
@@ -61,6 +71,24 @@ function App() {
     return (
         <>
             <h1>Pokemony</h1>
+
+            <input
+
+                className="search-input"
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+            />
+
+            <select
+                className="type-select"
+                value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
+                <option value="">Wszystkie typy</option>
+                {getUniqueTypes().map(type => (
+                    <option key={type} value={type}>{type}</option>
+                ))}
+            </select>
+
             <div style={{ textAlign: "center" }}>
                 {loading ? (
                     <p>Ładowanie...</p>
@@ -72,8 +100,25 @@ function App() {
                         justifyContent: 'center',
                         padding: '20px'
                     }}>
-                        {pokemons.map((pokemon) => (
-                            <Card key={pokemon.id} pokemon={pokemon} />
+                        {pokemons
+                            .filter((pokemon) => {
+                                const matchesName = pokemon.name.includes(text);
+                                const matchesType = selectedType === '' || pokemon.types.includes(selectedType);
+                                return matchesName && matchesType;
+                            })
+                            .map((pokemon) => (
+                                <Card
+                                    key={pokemon.id}
+                                    pokemon={pokemon}
+                                    showDetails={showDetailsForId === pokemon.id}
+                                    onToggleDetails={() => {
+                                        if (showDetailsForId === pokemon.id) {
+                                            setShowDetailsForId(null);
+                                        } else {
+                                            setShowDetailsForId(pokemon.id);
+                                        }
+                                    }}
+                                />
                         ))}
                     </div>
 
