@@ -39,7 +39,7 @@ function App() {
             weight: pokemonData.weight,
             abilities: pokemonData.abilities.map((ability: any) => ability.ability.name),
             types: pokemonData.types.map((type: any) => type.type.name),
-            sprite: pokemonData.sprites.front_default
+            sprite: pokemonData.sprites.front_shiny
         };
     }
 
@@ -106,6 +106,7 @@ function App() {
                                 const matchesType = selectedType === '' || pokemon.types.includes(selectedType);
                                 return matchesName && matchesType;
                             })
+
                             .map((pokemon) => (
                                 <Card
                                     key={pokemon.id}
